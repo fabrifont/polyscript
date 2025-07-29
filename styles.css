@@ -1,0 +1,28 @@
+.main {
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    flex-direction: column;
+    padding: 100px;
+    background-color: #001623;
+}
+
+.main > div {
+    border-radius: 20px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 100px;
+    background-color: #633490;
+    font-weight: 500;
+    text-shadow: 2px 2px 20px black;
+}
+
+p {
+    font-size: larger;
+    max-width: 900px;
+}
