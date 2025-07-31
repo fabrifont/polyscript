@@ -17,14 +17,14 @@ function validCoordenate(input) {
     const length = input.length;
     const isEmpty = length === 0;
     let isText = false;
-    for (i = 0; i < length; i++) {
-        if (!digits.includes(input[i])) {
+    for (j = 0; j < length; j++) {
+        if (!digits.includes(input[j])) {
             isText = true;
             break;
         }
     }
 
-    return !(isEmpty || isText);
+    return !isEmpty && !isText;
 }
 
 // askCoordenate: Char -> Number
@@ -41,42 +41,52 @@ function askCoordenate(c, n) {
     return parseFloat(coordenate);
 }
 
-// (FALTA AGREGAR) Variables para manejo del ingreso de datos de puntos.
-// Buscar si se puede decidir si declarar las variables o no en función
-// de si el usuario decide iniciar el programa.
-
+// Dot: Number Number -> Object
+// Función constructora del objeto Dot.
+// Se usa para representar un punto en un plano cartesiano
 function Dot(x, y) {
     this.x = x;
     this.y = y;
 }
 
-let x;
-let y;
-let dots = [];
-
 // ------------------------------------------------------------------------------
 
 // Ejecución del programa principal
 
-// (FALTA AGREGAR) Flag para frenar el while cuando no se quieran ingresar más puntos
+// Flag para frenar el while cuando no se quieran ingresar más puntos
 let continueProgram = true;
 
 // Flag para iniciar o no el programa
 const start = confirm(startMessage);
 
-// (FALTA AGREGAR) Procesamiento correcto de los puntos y su representación en los
-// mensajes de alerta
+// Variables para almacenamiento de las coordenadas y los puntos
+// (FALTA AGREGAR) Procesamiento de los puntos e interpretación de los polígonos
+let x;
+let y;
+let dots = [];
+
+// Variables para mostrar información acerca de lo que se ingresó
+let dotsStrings = [];
+let dotsList = "";
 
 if (!start) {
     alert(exitMessage);
 } else {
     for (i = 1; continueProgram; i++) {
         x = askCoordenate("X", i);
-        if (x == null) break;
+        if (x === null) {
+            continueProgram = false;
+            break;
+        }
         y = askCoordenate("Y", i);
-        if (y == null) break;
+        if (y === null) {
+            continueProgram = false;
+            break;
+        }
         dots.push(new Dot(x, y));
+        dotsStrings.push(`(${dots[i - 1].x},${dots[i - 1].y})`);
     }
-    alert(`Usted estableció los siguientes puntos:\n${dots.join()}`);
+    dotsList = dotsStrings.join(", ");
+    alert(`Usted estableció los siguientes puntos:\n${dotsList}`);
     alert(exitMessage);
 }
