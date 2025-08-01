@@ -17,7 +17,8 @@ function validCoordenate(input) {
     const length = input.length;
     const isEmpty = length === 0;
     let isText = false;
-    for (j = 0; j < length; j++) {
+    let hasMinus = Number(input[0] === "-");
+    for (j = hasMinus ? 1 : 0; j < length; j++) {
         if (!digits.includes(input[j])) {
             isText = true;
             break;
