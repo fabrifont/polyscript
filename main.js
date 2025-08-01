@@ -31,11 +31,15 @@ function validCoordenate(input) {
 // Recibe la letra de la coordenada a solicitar y pregunta al usuario
 // el número que quiere ingresar para la misma. Devuelve el número.
 function askCoordenate(c, n) {
-    let coordenate = prompt(`Escriba la coordenada ${c} del punto n°${n}:`);
+    let coordenate = prompt(
+        `Escriba la coordenada ${c} del punto n°${n}\n(presione Cancelar para finalizar):`
+    );
     if (coordenate === null) return null;
     while (!validCoordenate(coordenate)) {
         alert("Ese no es un número. Intente de nuevo.");
-        coordenate = prompt(`Escriba la coordenada ${c} del punto n°${n}:`);
+        coordenate = prompt(
+            `Escriba la coordenada ${c} del punto n°${n}\n(presione Cancelar para finalizar):`
+        );
         if (coordenate === null) return null;
     }
     return parseFloat(coordenate);
@@ -49,6 +53,47 @@ function Dot(x, y) {
     this.y = y;
 }
 
+// filterHighest: Array Filter -> Array
+// Recibe un array y una función filtro y devuelve
+// los elementos para los cuales el filtro devuelve el valor más alto
+// (array porque puede haber más de uno con el valor más alto, teniendo
+// ambos el mismo valor)
+function filterHighest(array, filter) {
+    const length = array.length;
+    let filtered = [array[0]];
+    let filteredValue = [filter(array[0])];
+    for (k = 0; k < length; k++) {
+        if (
+            filter(array[k]) == filteredValue[0] &&
+            !filtered.includes(array[k])
+        ) {
+            filtered.push(array[k]);
+        } else if (filter(array[k]) > filteredValue[0]) {
+            filtered = [array[k]];
+            filteredValue = [filter(array[k])];
+        }
+    }
+    return filtered;
+}
+
+// dotToString: Dot -> String
+// Recibe un Dot y lo devuelve en un string de la forma "(x, y)"
+function dotToString(dot) {
+    return `(${dot.x}, ${dot.y})`;
+}
+
+// quantifyDotArrayToString: ArrayOfDot String String -> String
+// Recibe un array de Dot, un texto por si hay más de un Dot y un texto por si hay
+// sólo un Dot. Devuelve un string con el texto y los dots correspondientes
+function quantifyDotArrayToString(dotArray, singular, plural) {
+    if (dotArray.length > 1) {
+        const StringList = dotArray.map(dotToString).join(", ");
+        return plural + StringList;
+    } else {
+        return singular + dotToString(dotArray[0]);
+    }
+}
+
 // ------------------------------------------------------------------------------
 
 // Ejecución del programa principal
@@ -60,7 +105,7 @@ let continueProgram = true;
 const start = confirm(startMessage);
 
 // Variables para almacenamiento de las coordenadas y los puntos
-// (FALTA AGREGAR) Procesamiento de los puntos e interpretación de los polígonos
+// (FALTA AGREGAR) Interpretación de los polígonos
 let x;
 let y;
 let dots = [];
@@ -84,9 +129,56 @@ if (!start) {
             break;
         }
         dots.push(new Dot(x, y));
-        dotsStrings.push(`(${dots[i - 1].x},${dots[i - 1].y})`);
+        dotsStrings.push(dotToString(dots[i - 1]));
     }
+
     dotsList = dotsStrings.join(", ");
     alert(`Usted estableció los siguientes puntos:\n${dotsList}`);
+
+    let highestDots = filterHighest(dots, (dot) => {
+        return dot.y;
+    });
+    let lowestDots = filterHighest(dots, (dot) => {
+        return -1 * dot.y;
+    });
+    let furthestRightDots = filterHighest(dots, (dot) => {
+        return dot.x;
+    });
+    let furthestLeftDots = filterHighest(dots, (dot) => {
+        return -1 * dot.x;
+    });
+
+    alert(
+        quantifyDotArrayToString(
+            highestDots,
+            "El punto más alto fue: ",
+            "Los punto más altos fueron: "
+        )
+    );
+
+    alert(
+        quantifyDotArrayToString(
+            lowestDots,
+            "El punto más bajo fue: ",
+            "Los punto más bajos fueron: "
+        )
+    );
+
+    alert(
+        quantifyDotArrayToString(
+            furthestRightDots,
+            "El punto más a la derecha fue: ",
+            "Los puntos más a la derecha fueron: "
+        )
+    );
+
+    alert(
+        quantifyDotArrayToString(
+            furthestLeftDots,
+            "El punto más a la izquierda fue: ",
+            "Los puntos más a la izquierda fueron: "
+        )
+    );
+
     alert(exitMessage);
 }
