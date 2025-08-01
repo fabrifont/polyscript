@@ -3,7 +3,8 @@
 // (punto, línea, triángulo, cuadrilátero, pentágono, hexágono, heptágono)
 
 // Mensajes de bienvenida y despedida a la app
-const startMessage = "Bienvenido a PolyScript. ¿Estás listo para comenzar?";
+const startMessage =
+    "Bienvenido a PolyScript. ¿Estás listo para comenzar?\n\n(presione Cancelar en cualquier momento para finalizar)";
 const exitMessage = "¡Gracias por visitarnos!";
 
 // validCoordenate: String -> Bool
@@ -32,15 +33,11 @@ function validCoordenate(input) {
 // Recibe la letra de la coordenada a solicitar y pregunta al usuario
 // el número que quiere ingresar para la misma. Devuelve el número.
 function askCoordenate(c, n) {
-    let coordenate = prompt(
-        `Escriba la coordenada ${c} del punto n°${n}\n(presione Cancelar para finalizar):`
-    );
+    let coordenate = prompt(`Escriba la coordenada ${c} del punto n°${n}:`);
     if (coordenate === null) return null;
     while (!validCoordenate(coordenate)) {
         alert("Ese no es un número. Intente de nuevo.");
-        coordenate = prompt(
-            `Escriba la coordenada ${c} del punto n°${n}\n(presione Cancelar para finalizar):`
-        );
+        coordenate = prompt(`Escriba la coordenada ${c} del punto n°${n}:`);
         if (coordenate === null) return null;
     }
     return parseFloat(coordenate);
@@ -133,53 +130,55 @@ if (!start) {
         dotsStrings.push(dotToString(dots[i - 1]));
     }
 
-    dotsList = dotsStrings.join(", ");
-    alert(`Usted estableció los siguientes puntos:\n${dotsList}`);
+    if (dots != 0) {
+        dotsList = dotsStrings.join(", ");
+        alert(`Usted estableció los siguientes puntos:\n${dotsList}`);
 
-    let highestDots = filterHighest(dots, (dot) => {
-        return dot.y;
-    });
-    let lowestDots = filterHighest(dots, (dot) => {
-        return -1 * dot.y;
-    });
-    let furthestRightDots = filterHighest(dots, (dot) => {
-        return dot.x;
-    });
-    let furthestLeftDots = filterHighest(dots, (dot) => {
-        return -1 * dot.x;
-    });
+        let highestDots = filterHighest(dots, (dot) => {
+            return dot.y;
+        });
+        let lowestDots = filterHighest(dots, (dot) => {
+            return -1 * dot.y;
+        });
+        let furthestRightDots = filterHighest(dots, (dot) => {
+            return dot.x;
+        });
+        let furthestLeftDots = filterHighest(dots, (dot) => {
+            return -1 * dot.x;
+        });
 
-    alert(
-        quantifyDotArrayToString(
-            highestDots,
-            "El punto más alto fue: ",
-            "Los punto más altos fueron: "
-        )
-    );
+        alert(
+            quantifyDotArrayToString(
+                highestDots,
+                "El punto más alto fue: ",
+                "Los punto más altos fueron: "
+            )
+        );
 
-    alert(
-        quantifyDotArrayToString(
-            lowestDots,
-            "El punto más bajo fue: ",
-            "Los punto más bajos fueron: "
-        )
-    );
+        alert(
+            quantifyDotArrayToString(
+                lowestDots,
+                "El punto más bajo fue: ",
+                "Los punto más bajos fueron: "
+            )
+        );
 
-    alert(
-        quantifyDotArrayToString(
-            furthestRightDots,
-            "El punto más a la derecha fue: ",
-            "Los puntos más a la derecha fueron: "
-        )
-    );
+        alert(
+            quantifyDotArrayToString(
+                furthestRightDots,
+                "El punto más a la derecha fue: ",
+                "Los puntos más a la derecha fueron: "
+            )
+        );
 
-    alert(
-        quantifyDotArrayToString(
-            furthestLeftDots,
-            "El punto más a la izquierda fue: ",
-            "Los puntos más a la izquierda fueron: "
-        )
-    );
+        alert(
+            quantifyDotArrayToString(
+                furthestLeftDots,
+                "El punto más a la izquierda fue: ",
+                "Los puntos más a la izquierda fueron: "
+            )
+        );
+    }
 
     alert(exitMessage);
 }
