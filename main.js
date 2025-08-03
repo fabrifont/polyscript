@@ -46,9 +46,17 @@ function askCoordenate(c, n) {
 // Dot: Number Number -> Object
 // Función constructora del objeto Dot.
 // Se usa para representar un punto en un plano cartesiano
-function Dot(x, y) {
-    this.x = x;
-    this.y = y;
+class Dot {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    // toString: (empty) -> String
+    // Devuelve las coordenadas del Dot en un string de la forma "(x, y)"
+    toString() {
+        return `(${this.x}, ${this.y})`;
+    }
 }
 
 // filterHighest: Array Filter -> Array
@@ -74,21 +82,19 @@ function filterHighest(array, filter) {
     return filtered;
 }
 
-// dotToString: Dot -> String
-// Recibe un Dot y lo devuelve en un string de la forma "(x, y)"
-function dotToString(dot) {
-    return `(${dot.x}, ${dot.y})`;
-}
-
 // quantifyDotArrayToString: ArrayOfDot String String -> String
 // Recibe un array de Dot, un texto por si hay más de un Dot y un texto por si hay
 // sólo un Dot. Devuelve un string con el texto y los dots correspondientes
 function quantifyDotArrayToString(dotArray, singular, plural) {
     if (dotArray.length > 1) {
-        const StringList = dotArray.map(dotToString).join(", ");
+        const StringList = dotArray
+            .map((dot) => {
+                return dot.toString();
+            })
+            .join(", ");
         return plural + StringList;
     } else {
-        return singular + dotToString(dotArray[0]);
+        return singular + dotArray[0].toString();
     }
 }
 
@@ -127,7 +133,7 @@ if (!start) {
             break;
         }
         dots.push(new Dot(x, y));
-        dotsStrings.push(dotToString(dots[i - 1]));
+        dotsStrings.push(dots[i - 1].toString());
     }
 
     if (dots != 0) {
