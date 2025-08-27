@@ -2,11 +2,6 @@
 // mensaje con el nombre del polígono que creaste según los puntos que ingresaste
 // (punto, línea, triángulo, cuadrilátero, pentágono, hexágono, heptágono)
 
-// Mensajes de bienvenida y despedida a la app
-const startMessage =
-    "Bienvenido a PolyScript. ¿Estás listo para comenzar?\n\n(presione Cancelar en cualquier momento para finalizar)";
-const exitMessage = "¡Gracias por visitarnos!";
-
 // validCoordenate: String -> Bool
 // Recibe un string y valida si el mismo es un número o no.
 // Revisa primero si el string es vacío y luego si todos los caracteres
@@ -108,6 +103,11 @@ let continueProgram = true;
 // Flag para iniciar o no el programa
 const start = confirm(startMessage);
 
+// Mensajes de bienvenida y despedida a la app
+const startMessage =
+    "Bienvenido a PolyScript. ¿Estás listo para comenzar?\n\n(presione Cancelar en cualquier momento para finalizar)";
+const exitMessage = "¡Gracias por visitarnos!";
+
 // Variables para almacenamiento de las coordenadas y los puntos
 // (FALTA AGREGAR) Interpretación de los polígonos
 let x;
@@ -121,70 +121,5 @@ let dotsList = "";
 if (!start) {
     alert(exitMessage);
 } else {
-    for (i = 1; continueProgram; i++) {
-        x = askCoordenate("X", i);
-        if (x === null) {
-            continueProgram = false;
-            break;
-        }
-        y = askCoordenate("Y", i);
-        if (y === null) {
-            continueProgram = false;
-            break;
-        }
-        dots.push(new Dot(x, y));
-        dotsStrings.push(dots[i - 1].toString());
-    }
-
-    if (dots != 0) {
-        dotsList = dotsStrings.join(", ");
-        alert(`Usted estableció los siguientes puntos:\n${dotsList}`);
-
-        let highestDots = filterHighest(dots, (dot) => {
-            return dot.y;
-        });
-        let lowestDots = filterHighest(dots, (dot) => {
-            return -1 * dot.y;
-        });
-        let furthestRightDots = filterHighest(dots, (dot) => {
-            return dot.x;
-        });
-        let furthestLeftDots = filterHighest(dots, (dot) => {
-            return -1 * dot.x;
-        });
-
-        alert(
-            quantifyDotArrayToString(
-                highestDots,
-                "El punto más alto fue: ",
-                "Los punto más altos fueron: "
-            )
-        );
-
-        alert(
-            quantifyDotArrayToString(
-                lowestDots,
-                "El punto más bajo fue: ",
-                "Los punto más bajos fueron: "
-            )
-        );
-
-        alert(
-            quantifyDotArrayToString(
-                furthestRightDots,
-                "El punto más a la derecha fue: ",
-                "Los puntos más a la derecha fueron: "
-            )
-        );
-
-        alert(
-            quantifyDotArrayToString(
-                furthestLeftDots,
-                "El punto más a la izquierda fue: ",
-                "Los puntos más a la izquierda fueron: "
-            )
-        );
-    }
-
-    alert(exitMessage);
+    // CÓDIGO A EJECUTAR
 }
