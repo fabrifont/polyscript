@@ -97,17 +97,6 @@ function quantifyDotArrayToString(dotArray, singular, plural) {
 
 // Ejecución del programa principal
 
-// Flag para frenar el while cuando no se quieran ingresar más puntos
-let continueProgram = true;
-
-// Flag para iniciar o no el programa
-const start = confirm(startMessage);
-
-// Mensajes de bienvenida y despedida a la app
-const startMessage =
-    "Bienvenido a PolyScript. ¿Estás listo para comenzar?\n\n(presione Cancelar en cualquier momento para finalizar)";
-const exitMessage = "¡Gracias por visitarnos!";
-
 // Variables para almacenamiento de las coordenadas y los puntos
 // (FALTA AGREGAR) Interpretación de los polígonos
 let x;
@@ -118,8 +107,19 @@ let dots = [];
 let dotsStrings = [];
 let dotsList = "";
 
-if (!start) {
-    alert(exitMessage);
-} else {
-    // CÓDIGO A EJECUTAR
-}
+// Elementos principales del documento
+const startBtn = document.querySelector("#start-btn");
+const startText = document.querySelector(".main > p");
+const mainContainer = document.querySelector(".main");
+
+// Canvas del plano
+const canvas = document.createElement("canvas");
+canvas.setAttribute("width", 900);
+canvas.setAttribute("height", 600);
+
+// ------------------------------------------------------------------------------
+
+startBtn.addEventListener("click", () => {
+    startBtn.remove();
+    mainContainer.appendChild(canvas);
+});
