@@ -126,11 +126,27 @@ function placeDot(event) {
     const y = event.clientY - rect.top;
     const dot = new Dot(x, y);
     dots.push(dot);
+    const n = dots.length - 1;
     console.log(`puntos definidos: ${dots}`);
     context.beginPath();
     context.arc(x, y, 5, 0, 2 * Math.PI);
     context.fillStyle = "black";
     context.fill();
+    console.log(n);
+    console.log(dots[n]);
+    if (n > 0) drawLine(dots[n - 1], dots[n]);
+}
+
+// drawLine: Dot Dot -> Void
+// recibe dos objetos Dot y dibuja una línea en el canvas
+// que una dichos puntos
+function drawLine(dot1, dot2) {
+    context.beginPath();
+    context.moveTo(dot1.x, dot1.y);
+    context.lineTo(dot2.x, dot2.y);
+    context.strokeStyle = "black";
+    context.lineWidth = 2;
+    context.stroke();
 }
 
 // clearPlane: Void -> Void
