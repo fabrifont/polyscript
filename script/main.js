@@ -100,7 +100,6 @@ function quantifyDotArrayToString(dotArray, singular, plural) {
 // Variables para almacenamiento de las coordenadas y los puntos
 // (FALTA AGREGAR) Interpretación de los polígonos
 let dots = [];
-const pi = Math.pi;
 
 // Elementos principales del documento
 const startBtn = document.querySelector("#start-btn");
@@ -110,8 +109,13 @@ const mainContainer = document.querySelector(".main");
 // Canvas del plano
 const canvas = document.createElement("canvas");
 canvas.setAttribute("width", 900);
-canvas.setAttribute("height", 600);
+canvas.setAttribute("height", 550);
 const context = canvas.getContext("2d");
+
+// Botón para limpiar los puntos del plano
+const clearBtn = document.createElement("button");
+clearBtn.setAttribute("id", "clear");
+clearBtn.innerHTML = "Clear";
 
 // placeDot: Event -> Void
 // recibe el evento de un click, crea un dot con las coordenadas
@@ -120,13 +124,21 @@ function placeDot(event) {
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-    console.log(`puntos definidos: ${dots}`);
     const dot = new Dot(x, y);
     dots.push(dot);
+    console.log(`puntos definidos: ${dots}`);
     context.beginPath();
-    context.arc(x, y, 10, 0, 2 * Math.PI);
+    context.arc(x, y, 5, 0, 2 * Math.PI);
     context.fillStyle = "black";
     context.fill();
+}
+
+// clearPlane: Void -> Void
+// no recibe ningún dato, elimina los puntos del canvas y
+// vacía el array de dots
+function clearPlane() {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    dots = [];
 }
 
 // ------------------------------------------------------------------------------
@@ -134,6 +146,8 @@ function placeDot(event) {
 startBtn.addEventListener("click", () => {
     startBtn.remove();
     mainContainer.appendChild(canvas);
+    mainContainer.appendChild(clearBtn);
 });
 
 canvas.addEventListener("click", placeDot);
+clearBtn.addEventListener("click", clearPlane);
