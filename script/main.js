@@ -99,13 +99,8 @@ function quantifyDotArrayToString(dotArray, singular, plural) {
 
 // Variables para almacenamiento de las coordenadas y los puntos
 // (FALTA AGREGAR) Interpretación de los polígonos
-let x;
-let y;
 let dots = [];
-
-// Variables para mostrar información acerca de lo que se ingresó
-let dotsStrings = [];
-let dotsList = "";
+const pi = Math.pi;
 
 // Elementos principales del documento
 const startBtn = document.querySelector("#start-btn");
@@ -116,6 +111,23 @@ const mainContainer = document.querySelector(".main");
 const canvas = document.createElement("canvas");
 canvas.setAttribute("width", 900);
 canvas.setAttribute("height", 600);
+const context = canvas.getContext("2d");
+
+// placeDot: Event -> Void
+// recibe el evento de un click, crea un dot con las coordenadas
+// de ese click, lo pushea a la lista de dots, y lo dibuja en el plano
+function placeDot(event) {
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    console.log(`puntos definidos: ${dots}`);
+    const dot = new Dot(x, y);
+    dots.push(dot);
+    context.beginPath();
+    context.arc(x, y, 10, 0, 2 * Math.PI);
+    context.fillStyle = "black";
+    context.fill();
+}
 
 // ------------------------------------------------------------------------------
 
@@ -123,3 +135,5 @@ startBtn.addEventListener("click", () => {
     startBtn.remove();
     mainContainer.appendChild(canvas);
 });
+
+canvas.addEventListener("click", placeDot);
