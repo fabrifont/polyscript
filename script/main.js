@@ -93,30 +93,6 @@ function quantifyDotArrayToString(dotArray, singular, plural) {
     }
 }
 
-// ------------------------------------------------------------------------------
-
-// Ejecución del programa principal
-
-// Variables para almacenamiento de las coordenadas y los puntos
-// (FALTA AGREGAR) Interpretación de los polígonos
-let dots = [];
-
-// Elementos principales del documento
-const startBtn = document.querySelector("#start-btn");
-const startText = document.querySelector(".main > p");
-const mainContainer = document.querySelector(".main");
-
-// Canvas del plano
-const canvas = document.createElement("canvas");
-canvas.setAttribute("width", 900);
-canvas.setAttribute("height", 550);
-const context = canvas.getContext("2d");
-
-// Botón para limpiar los puntos del plano
-const clearBtn = document.createElement("button");
-clearBtn.setAttribute("id", "clear");
-clearBtn.innerHTML = "Clear";
-
 // placeDot: Event -> Void
 // recibe el evento de un click, crea un dot con las coordenadas
 // de ese click, lo pushea a la lista de dots, y lo dibuja en el plano
@@ -149,6 +125,39 @@ function drawLine(dot1, dot2) {
     context.stroke();
 }
 
+// dist: Dot Dot -> Float
+// recibe dos objetos Dot (puntos) y devuelve la distancia
+// entre ellos
+function dist(d1, d2) {
+    const distX = abs(d1.x - d2.x);
+    const distY = abs(d1.y - d2.y);
+    return sqrt(distX * distX + distY * distY);
+}
+
+// cosineTheorem: Float Float Float -> Float
+// recibe los 3 lados de un triángulo y devuelve el
+// valor en grados del ángulo opuesto al segundo lado,
+// calculado usando el Teorema del Coseno
+function cosineTheorem(side1, side2, side3) {
+    const radToDeg = 180 / Math.PI;
+    const numerator = side1 * side1 - side2 * side2 + side3 * side3;
+    const denominator = 2 * side1 * side3;
+    const radAngle = Math.acos(numerator / denominator);
+    return radToDeg * radAngle;
+}
+
+// TODO: TERMINAR ESTA FUNCION Y AGREGAR FUNCIONALIDADES DE TERMINAR
+// POLIGONO, Y CREAR OTRO (VARIOS), ARRAY DE ARRAYS DOTS
+// vertexAngle: Dot Dot Dot -> Float
+// recibe tres objetos Dot y calcula el ángulo en grados
+// formado por los tres, teniendo el segundo como vértice
+function vertexAngle(dot1, dot2, dot3) {
+    const dot1_oppSide = dist(dot2, dot3);
+    const dot2_oppSide = dist(dot1, dot3);
+    const dot3_oppSide = dist(dot1, dot2);
+    return cosineTheorem(dot1_oppSide, dot2_oppSide, dot3_oppSide);
+}
+
 // clearPlane: Void -> Void
 // no recibe ningún dato, elimina los puntos del canvas y
 // vacía el array de dots
@@ -158,12 +167,35 @@ function clearPlane() {
 }
 
 // ------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------
+
+// Ejecución del programa principal
+
+// Variables para almacenamiento de las coordenadas y los puntos
+// (FALTA AGREGAR) Interpretación de los polígonos
+let dots = [];
+
+// Elementos principales del documento
+const startBtn = document.querySelector("#start-btn");
+const startText = document.querySelector(".main > p");
+const mainContainer = document.querySelector(".main");
 
 startBtn.addEventListener("click", () => {
     startBtn.remove();
     mainContainer.appendChild(canvas);
     mainContainer.appendChild(clearBtn);
 });
+
+// Canvas del plano
+const canvas = document.createElement("canvas");
+canvas.setAttribute("width", 900);
+canvas.setAttribute("height", 550);
+const context = canvas.getContext("2d");
+
+// Botón para limpiar los puntos del plano
+const clearBtn = document.createElement("button");
+clearBtn.setAttribute("id", "clear");
+clearBtn.innerHTML = "Clear";
 
 canvas.addEventListener("click", placeDot);
 clearBtn.addEventListener("click", clearPlane);
