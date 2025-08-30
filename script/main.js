@@ -148,7 +148,7 @@ function saveCanvas() {
 function loadCanvas() {
     canvas.width = canvas.width;
     const newState = JSON.parse(localStorage.getItem("canvasImage"));
-    dots = newState.dotList;
+    dots = newState === null ? [] : newState.dotList;
     const l = dots.length;
     for (let i = 0; i < l; i++) {
         drawDot(dots[i]);
