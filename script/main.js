@@ -2,42 +2,6 @@
 // mensaje con el nombre del polígono que creaste según los puntos que ingresaste
 // (punto, línea, triángulo, cuadrilátero, pentágono, hexágono, heptágono)
 
-// validCoordenate: String -> Bool
-// Recibe un string y valida si el mismo es un número o no.
-// Revisa primero si el string es vacío y luego si todos los caracteres
-// del mismo son dígitos (o un punto, para el caso de flotantes).
-// Devuelve verdadero si el input es efectivamente un número entero o flotante,
-// falso en caso contrario.
-function validCoordenate(input) {
-    const digits = "0123456789.";
-    const length = input.length;
-    const isEmpty = length === 0;
-    let isText = false;
-    let hasMinus = Number(input[0] === "-");
-    for (j = hasMinus ? 1 : 0; j < length; j++) {
-        if (!digits.includes(input[j])) {
-            isText = true;
-            break;
-        }
-    }
-
-    return !isEmpty && !isText;
-}
-
-// askCoordenate: Char -> Number
-// Recibe la letra de la coordenada a solicitar y pregunta al usuario
-// el número que quiere ingresar para la misma. Devuelve el número.
-function askCoordenate(c, n) {
-    let coordenate = prompt(`Escriba la coordenada ${c} del punto n°${n}:`);
-    if (coordenate === null) return null;
-    while (!validCoordenate(coordenate)) {
-        alert("Ese no es un número. Intente de nuevo.");
-        coordenate = prompt(`Escriba la coordenada ${c} del punto n°${n}:`);
-        if (coordenate === null) return null;
-    }
-    return parseFloat(coordenate);
-}
-
 // Dot: Number Number -> Object
 // Función constructora del objeto Dot.
 // Se usa para representar un punto en un plano cartesiano
@@ -54,45 +18,6 @@ class Dot {
     }
 }
 
-// filterHighest: Array Filter -> Array
-// Recibe un array y una función filtro y devuelve
-// los elementos para los cuales el filtro devuelve el valor más alto
-// (array porque puede haber más de uno con el valor más alto, teniendo
-// ambos el mismo valor)
-function filterHighest(array, filter) {
-    const length = array.length;
-    let filtered = [array[0]];
-    let filteredValue = [filter(array[0])];
-    for (k = 0; k < length; k++) {
-        if (
-            filter(array[k]) == filteredValue[0] &&
-            !filtered.includes(array[k])
-        ) {
-            filtered.push(array[k]);
-        } else if (filter(array[k]) > filteredValue[0]) {
-            filtered = [array[k]];
-            filteredValue = [filter(array[k])];
-        }
-    }
-    return filtered;
-}
-
-// quantifyDotArrayToString: ArrayOfDot String String -> String
-// Recibe un array de Dot, un texto por si hay más de un Dot y un texto por si hay
-// sólo un Dot. Devuelve un string con el texto y los dots correspondientes
-function quantifyDotArrayToString(dotArray, singular, plural) {
-    if (dotArray.length > 1) {
-        const StringList = dotArray
-            .map((dot) => {
-                return dot.toString();
-            })
-            .join(", ");
-        return plural + StringList;
-    } else {
-        return singular + dotArray[0].toString();
-    }
-}
-
 // equalDot: Dot Dot -> Bool
 // recibe dos puntos y devuelve verdadero si son
 // coincidentes, falso en caso contrario
@@ -102,11 +27,21 @@ function equalDots(a, b) {
     return equalX && equalY;
 }
 
-// nearbyDot
+// drawDot: Dot -> Void
+// Recibe un Dot y dibuja el mismo en el canvas
+function drawDot(toDraw) {
+    context.beginPath();
+    context.arc(toDraw.x, toDraw.y, 5, 0, 2 * Math.PI);
+    context.fillStyle = "black";
+    context.fill();
+}
 
 // placeDot: Event -> Void
 // recibe el evento de un click, crea un dot con las coordenadas
-// de ese click, lo pushea a la lista de dots, y lo dibuja en el plano
+// de ese click, lo pushea a la lista de dots, y lo dibuja en el plano.
+// Si hay más de 1 punto, dibuja una línea entre el actual y el anterior.
+// Si hay más de 2 puntos, calcula y escribe el ángulo que forman el
+// último, el penúltimo (vértice), y el antepenúltimo
 function placeDot(event) {
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
@@ -114,10 +49,7 @@ function placeDot(event) {
     const dot = new Dot(x, y);
     dots.push(dot);
     const n = dots.length - 1;
-    context.beginPath();
-    context.arc(x, y, 5, 0, 2 * Math.PI);
-    context.fillStyle = "black";
-    context.fill();
+    drawDot(dot);
     if (n > 0) drawLine(dots[n - 1], dots[n]);
     if (n > 1) {
         if (
@@ -198,10 +130,19 @@ function clearPlane() {
     dots = [];
 }
 
+// saveCanvas: Void -> Void
+// No recibe ningún dato, guarda en el storage el
+// estado actual del canvas
+function saveCanvas() {
+    localStorage.setItem();
+}
+
 // ------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------
 
 // Ejecución del programa principal
+const CANVAS_WIDTH = 900;
+const CANVAS_HEIGHT = 550;
 
 // Variables para almacenamiento de las coordenadas y los puntos
 // (FALTA AGREGAR) Interpretación de los polígonos
@@ -209,25 +150,35 @@ let dots = [];
 
 // Elementos principales del documento
 const startBtn = document.querySelector("#start-btn");
-const startText = document.querySelector(".main > p");
 const mainContainer = document.querySelector(".main");
 
 startBtn.addEventListener("click", () => {
     startBtn.remove();
     mainContainer.appendChild(canvas);
     mainContainer.appendChild(clearBtn);
+    mainContainer.appendChild(saveBtn);
+    mainContainer.appendChild(loadBtn);
 });
 
 // Canvas del plano
 const canvas = document.createElement("canvas");
-canvas.setAttribute("width", 900);
-canvas.setAttribute("height", 550);
+canvas.setAttribute("width", CANVAS_WIDTH);
+canvas.setAttribute("height", CANVAS_HEIGHT);
 const context = canvas.getContext("2d");
 
 // Botón para limpiar los puntos del plano
 const clearBtn = document.createElement("button");
 clearBtn.setAttribute("id", "clear");
 clearBtn.innerHTML = "Clear";
+
+// Botones para guardar y cargar una imagen desde
+// el almacenamiento local
+const saveBtn = document.createElement("button");
+saveBtn.setAttribute("id", "saveBtn");
+saveBtn.innerHTML = "Save";
+const loadBtn = document.createElement("button");
+loadBtn.setAttribute("id", "loadBtn");
+loadBtn.innerHTML = "Load";
 
 canvas.addEventListener("click", placeDot);
 clearBtn.addEventListener("click", clearPlane);
