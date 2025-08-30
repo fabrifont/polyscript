@@ -111,6 +111,10 @@ function placeDot(event) {
     console.log(n);
     console.log(dots[n]);
     if (n > 0) drawLine(dots[n - 1], dots[n]);
+    if (n > 1) {
+        const dotAngle = vertexAngle(dots[n - 2], dots[n - 1], dots[n]);
+        writeAngle(dotAngle, dots[n - 1]);
+    }
 }
 
 // drawLine: Dot Dot -> Void
@@ -129,9 +133,9 @@ function drawLine(dot1, dot2) {
 // recibe dos objetos Dot (puntos) y devuelve la distancia
 // entre ellos
 function dist(d1, d2) {
-    const distX = abs(d1.x - d2.x);
-    const distY = abs(d1.y - d2.y);
-    return sqrt(distX * distX + distY * distY);
+    const distX = Math.abs(d1.x - d2.x);
+    const distY = Math.abs(d1.y - d2.y);
+    return Math.sqrt(distX * distX + distY * distY);
 }
 
 // cosineTheorem: Float Float Float -> Float
@@ -158,6 +162,19 @@ function vertexAngle(dot1, dot2, dot3) {
     return cosineTheorem(dot1_oppSide, dot2_oppSide, dot3_oppSide);
 }
 
+// writeAngle: Float Dot -> Void
+// recibe el valor de un ángulo en grados, y lo dibuja
+// un poco debajo del Dot correspondiente
+function writeAngle(angle, vertex) {
+    context.font = "18px Arial";
+    context.fillStyle = "blue";
+    context.strokeStyle = "";
+    context.lineWidth = 2;
+    const angleText = `${angle.toFixed(2)}°`;
+    const textPosX = vertex.x - 20;
+    const textPosY = vertex.y + 25;
+    context.fillText(angleText, textPosX, textPosY);
+}
 // clearPlane: Void -> Void
 // no recibe ningún dato, elimina los puntos del canvas y
 // vacía el array de dots
