@@ -93,6 +93,17 @@ function quantifyDotArrayToString(dotArray, singular, plural) {
     }
 }
 
+// equalDot: Dot Dot -> Bool
+// recibe dos puntos y devuelve verdadero si son
+// coincidentes, falso en caso contrario
+function equalDots(a, b) {
+    const equalX = a.x === b.x;
+    const equalY = a.y === b.y;
+    return equalX && equalY;
+}
+
+// nearbyDot
+
 // placeDot: Event -> Void
 // recibe el evento de un click, crea un dot con las coordenadas
 // de ese click, lo pushea a la lista de dots, y lo dibuja en el plano
@@ -103,17 +114,21 @@ function placeDot(event) {
     const dot = new Dot(x, y);
     dots.push(dot);
     const n = dots.length - 1;
-    console.log(`puntos definidos: ${dots}`);
     context.beginPath();
     context.arc(x, y, 5, 0, 2 * Math.PI);
     context.fillStyle = "black";
     context.fill();
-    console.log(n);
-    console.log(dots[n]);
     if (n > 0) drawLine(dots[n - 1], dots[n]);
     if (n > 1) {
-        const dotAngle = vertexAngle(dots[n - 2], dots[n - 1], dots[n]);
-        writeAngle(dotAngle, dots[n - 1]);
+        if (
+            equalDots(dots[n], dots[n - 1]) ||
+            equalDots(dots[n - 1], dots[n - 2])
+        )
+            writeAngle(0, dots[n - 1]);
+        else {
+            const dotAngle = vertexAngle(dots[n - 2], dots[n - 1], dots[n]);
+            writeAngle(dotAngle, dots[n - 1]);
+        }
     }
 }
 
@@ -170,9 +185,9 @@ function writeAngle(angle, vertex) {
     context.fillStyle = "blue";
     context.strokeStyle = "";
     context.lineWidth = 2;
-    const angleText = `${angle.toFixed(2)}°`;
     const textPosX = vertex.x - 20;
     const textPosY = vertex.y + 25;
+    const angleText = angle === 0 ? "0°" : `${angle.toFixed(2)}°`;
     context.fillText(angleText, textPosX, textPosY);
 }
 // clearPlane: Void -> Void
