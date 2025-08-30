@@ -19,7 +19,7 @@ class Dot {
 }
 
 // equalDot: Dot Dot -> Bool
-// recibe dos puntos y devuelve verdadero si son
+// Recibe dos puntos y devuelve verdadero si son
 // coincidentes, falso en caso contrario
 function equalDots(a, b) {
     const equalX = a.x === b.x;
@@ -36,8 +36,20 @@ function drawDot(toDraw) {
     context.fill();
 }
 
+// drawLine: Dot Dot -> Void
+// Recibe dos objetos Dot y dibuja una línea en el canvas
+// que una dichos puntos
+function drawLine(dot1, dot2) {
+    context.beginPath();
+    context.moveTo(dot1.x, dot1.y);
+    context.lineTo(dot2.x, dot2.y);
+    context.strokeStyle = "black";
+    context.lineWidth = 2;
+    context.stroke();
+}
+
 // placeDot: Event -> Void
-// recibe el evento de un click, crea un dot con las coordenadas
+// Recibe el evento de un click, crea un dot con las coordenadas
 // de ese click, lo pushea a la lista de dots, y lo dibuja en el plano.
 // Si hay más de 1 punto, dibuja una línea entre el actual y el anterior.
 // Si hay más de 2 puntos, calcula y escribe el ángulo que forman el
@@ -64,20 +76,8 @@ function placeDot(event) {
     }
 }
 
-// drawLine: Dot Dot -> Void
-// recibe dos objetos Dot y dibuja una línea en el canvas
-// que una dichos puntos
-function drawLine(dot1, dot2) {
-    context.beginPath();
-    context.moveTo(dot1.x, dot1.y);
-    context.lineTo(dot2.x, dot2.y);
-    context.strokeStyle = "black";
-    context.lineWidth = 2;
-    context.stroke();
-}
-
 // dist: Dot Dot -> Float
-// recibe dos objetos Dot (puntos) y devuelve la distancia
+// Recibe dos objetos Dot (puntos) y devuelve la distancia
 // entre ellos
 function dist(d1, d2) {
     const distX = Math.abs(d1.x - d2.x);
@@ -86,7 +86,7 @@ function dist(d1, d2) {
 }
 
 // cosineTheorem: Float Float Float -> Float
-// recibe los 3 lados de un triángulo y devuelve el
+// Recibe los 3 lados de un triángulo y devuelve el
 // valor en grados del ángulo opuesto al segundo lado,
 // calculado usando el Teorema del Coseno
 function cosineTheorem(side1, side2, side3) {
@@ -97,10 +97,8 @@ function cosineTheorem(side1, side2, side3) {
     return radToDeg * radAngle;
 }
 
-// TODO: TERMINAR ESTA FUNCION Y AGREGAR FUNCIONALIDADES DE TERMINAR
-// POLIGONO, Y CREAR OTRO (VARIOS), ARRAY DE ARRAYS DOTS
 // vertexAngle: Dot Dot Dot -> Float
-// recibe tres objetos Dot y calcula el ángulo en grados
+// Recibe tres objetos Dot y calcula el ángulo en grados
 // formado por los tres, teniendo el segundo como vértice
 function vertexAngle(dot1, dot2, dot3) {
     const dot1_oppSide = dist(dot2, dot3);
@@ -110,20 +108,22 @@ function vertexAngle(dot1, dot2, dot3) {
 }
 
 // writeAngle: Float Dot -> Void
-// recibe el valor de un ángulo en grados, y lo dibuja
+// Recibe el valor de un ángulo en grados, y lo dibuja
 // un poco debajo del Dot correspondiente
 function writeAngle(angle, vertex) {
+    const DELTA_X = -30;
+    const DELTA_Y = 25;
     context.font = "18px Courier";
     context.fillStyle = "blue";
     context.strokeStyle = "";
     context.lineWidth = 2;
-    const textPosX = vertex.x - 30;
-    const textPosY = vertex.y + 25;
+    const textPosX = vertex.x + DELTA_X;
+    const textPosY = vertex.y + DELTA_Y;
     const angleText = angle === 0 ? "0°" : `${angle.toFixed(2)}°`;
     context.fillText(angleText, textPosX, textPosY);
 }
 // clearPlane: Void -> Void
-// no recibe ningún dato, elimina los puntos del canvas y
+// No recibe ningún dato, elimina los puntos del canvas y
 // vacía el array de dots
 function clearPlane() {
     context.clearRect(0, 0, canvas.width, canvas.height);
@@ -143,7 +143,7 @@ function saveCanvas() {
 
 // loadCanvas: Void -> Void
 // No recibe ningún dato, busca en el local storage
-// el iteam "canvasImage" y recrea la imagen correspondiente
+// el item "canvasImage" y recrea la imagen correspondiente
 // dibujando todos los puntos, líneas y ángulos
 function loadCanvas() {
     canvas.width = canvas.width;
@@ -172,10 +172,12 @@ function loadCanvas() {
 // ------------------------------------------------------------------------------
 
 // Ejecución del programa principal
+
+// Medidas del canvas
 const CANVAS_WIDTH = 900;
 const CANVAS_HEIGHT = 550;
 
-// Variables para almacenamiento de las coordenadas y los puntos
+// Array para almacenamiento de los Dots
 let dots = [];
 
 // Elementos principales del documento
@@ -189,7 +191,7 @@ canvas.setAttribute("width", CANVAS_WIDTH);
 canvas.setAttribute("height", CANVAS_HEIGHT);
 const context = canvas.getContext("2d");
 
-// Contenedor de los botones
+// Contenedores de los botones
 const btnContainer = document.createElement("div");
 btnContainer.setAttribute("id", "btnContainer");
 const stateBtns = document.createElement("div");
@@ -209,7 +211,7 @@ const loadBtn = document.createElement("button");
 loadBtn.setAttribute("id", "loadBtn");
 loadBtn.innerHTML = "Load";
 
-// Asignación de escuchadores de eventos para cada botón
+// Asignación de escuchadores de eventos para cada elemento
 startBtn.addEventListener("click", () => {
     startBtn.remove();
     startText.innerHTML += " Click anywhere to start placing dots!";
