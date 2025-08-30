@@ -113,11 +113,11 @@ function vertexAngle(dot1, dot2, dot3) {
 // recibe el valor de un ángulo en grados, y lo dibuja
 // un poco debajo del Dot correspondiente
 function writeAngle(angle, vertex) {
-    context.font = "18px Arial";
+    context.font = "18px Courier";
     context.fillStyle = "blue";
     context.strokeStyle = "";
     context.lineWidth = 2;
-    const textPosX = vertex.x - 20;
+    const textPosX = vertex.x - 30;
     const textPosY = vertex.y + 25;
     const angleText = angle === 0 ? "0°" : `${angle.toFixed(2)}°`;
     context.fillText(angleText, textPosX, textPosY);
@@ -131,10 +131,41 @@ function clearPlane() {
 }
 
 // saveCanvas: Void -> Void
-// No recibe ningún dato, guarda en el storage el
+// No recibe ningún dato, guarda en el local storage el
 // estado actual del canvas
 function saveCanvas() {
-    localStorage.setItem();
+    const state = {
+        dotList: dots,
+    };
+    localStorage.setItem("canvasImage", JSON.stringify(state));
+    console.log("Imagen guardada.");
+}
+
+// loadCanvas: Void -> Void
+// No recibe ningún dato, busca en el local storage
+// el iteam "canvasImage" y recrea la imagen correspondiente
+// dibujando todos los puntos, líneas y ángulos
+function loadCanvas() {
+    canvas.width = canvas.width;
+    const newState = JSON.parse(localStorage.getItem("canvasImage"));
+    dots = newState.dotList;
+    const l = dots.length;
+    for (let i = 0; i < l; i++) {
+        drawDot(dots[i]);
+        if (i > 0) drawLine(dots[i - 1], dots[i]);
+        if (i > 1) {
+            if (
+                equalDots(dots[i], dots[i - 1]) ||
+                equalDots(dots[i - 1], dots[i - 2])
+            )
+                writeAngle(0, dots[i - 1]);
+            else {
+                const dotAngle = vertexAngle(dots[i - 2], dots[i - 1], dots[i]);
+                writeAngle(dotAngle, dots[i - 1]);
+            }
+        }
+    }
+    console.log("Imagen cargada.");
 }
 
 // ------------------------------------------------------------------------------
@@ -145,26 +176,24 @@ const CANVAS_WIDTH = 900;
 const CANVAS_HEIGHT = 550;
 
 // Variables para almacenamiento de las coordenadas y los puntos
-// (FALTA AGREGAR) Interpretación de los polígonos
 let dots = [];
 
 // Elementos principales del documento
 const startBtn = document.querySelector("#start-btn");
+const startText = document.querySelector(".main p");
 const mainContainer = document.querySelector(".main");
-
-startBtn.addEventListener("click", () => {
-    startBtn.remove();
-    mainContainer.appendChild(canvas);
-    mainContainer.appendChild(clearBtn);
-    mainContainer.appendChild(saveBtn);
-    mainContainer.appendChild(loadBtn);
-});
 
 // Canvas del plano
 const canvas = document.createElement("canvas");
 canvas.setAttribute("width", CANVAS_WIDTH);
 canvas.setAttribute("height", CANVAS_HEIGHT);
 const context = canvas.getContext("2d");
+
+// Contenedor de los botones
+const btnContainer = document.createElement("div");
+btnContainer.setAttribute("id", "btnContainer");
+const stateBtns = document.createElement("div");
+stateBtns.setAttribute("id", "stateBtns");
 
 // Botón para limpiar los puntos del plano
 const clearBtn = document.createElement("button");
@@ -180,5 +209,18 @@ const loadBtn = document.createElement("button");
 loadBtn.setAttribute("id", "loadBtn");
 loadBtn.innerHTML = "Load";
 
+// Asignación de escuchadores de eventos para cada botón
+startBtn.addEventListener("click", () => {
+    startBtn.remove();
+    startText.innerHTML += " Click anywhere to start drawing dots!";
+    mainContainer.appendChild(canvas);
+    mainContainer.appendChild(btnContainer);
+    btnContainer.appendChild(clearBtn);
+    btnContainer.appendChild(stateBtns);
+    stateBtns.appendChild(saveBtn);
+    stateBtns.appendChild(loadBtn);
+});
 canvas.addEventListener("click", placeDot);
 clearBtn.addEventListener("click", clearPlane);
+saveBtn.addEventListener("click", saveCanvas);
+loadBtn.addEventListener("click", loadCanvas);

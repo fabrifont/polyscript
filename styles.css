@@ -68,3 +68,16 @@ footer {
 #clear {
     margin-top: 10px;
 }
+
+#btnContainer {
+    display: flex;
+    justify-content: space-between;
+}
+
+#btnContainer button {
+    margin: 5px;
+    justify-content: center;
+    align-items: center;
+    width: 70px;
+    height: 30px;
+}
