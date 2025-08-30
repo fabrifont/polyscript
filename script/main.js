@@ -212,7 +212,7 @@ loadBtn.innerHTML = "Load";
 // Asignación de escuchadores de eventos para cada botón
 startBtn.addEventListener("click", () => {
     startBtn.remove();
-    startText.innerHTML += " Click anywhere to start drawing dots!";
+    startText.innerHTML += " Click anywhere to start placing dots!";
     mainContainer.appendChild(canvas);
     mainContainer.appendChild(btnContainer);
     btnContainer.appendChild(clearBtn);
