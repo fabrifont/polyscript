@@ -55,19 +55,23 @@ function placeDot(event) {
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     const dot = new Dot(x, y);
-    dots.push(dot);
-    const n = dots.length - 1;
+    dots[lastFigure].push(dot);
+    const n = dots[lastFigure].length - 1;
     drawDot(dot);
-    if (n > 0) drawLine(dots[n - 1], dots[n]);
+    if (n > 0) drawLine(dots[lastFigure][n - 1], dots[lastFigure][n]);
     if (n > 1) {
         if (
-            equalDots(dots[n], dots[n - 1]) ||
-            equalDots(dots[n - 1], dots[n - 2])
+            equalDots(dots[lastFigure][n], dots[lastFigure][n - 1]) ||
+            equalDots(dots[lastFigure][n - 1], dots[lastFigure][n - 2])
         )
-            writeAngle(0, dots[n - 1]);
+            writeAngle(0, dots[lastFigure][n - 1]);
         else {
-            const dotAngle = vertexAngle(dots[n - 2], dots[n - 1], dots[n]);
-            writeAngle(dotAngle, dots[n - 1]);
+            const dotAngle = vertexAngle(
+                dots[lastFigure][n - 2],
+                dots[lastFigure][n - 1],
+                dots[lastFigure][n]
+            );
+            writeAngle(dotAngle, dots[lastFigure][n - 1]);
         }
     }
 }
@@ -123,7 +127,7 @@ function writeAngle(angle, vertex) {
 // vacía el array de dots
 function clearPlane() {
     context.clearRect(0, 0, canvas.width, canvas.height);
-    dots = [];
+    dots = [[]];
     toastNotif("Cleared canvas");
 }
 
@@ -146,20 +150,27 @@ function saveCanvas() {
 function loadCanvas() {
     canvas.width = canvas.width;
     const newState = JSON.parse(localStorage.getItem("canvasImage"));
-    dots = newState === null ? [] : newState.dotList;
-    const l = dots.length;
-    for (let i = 0; i < l; i++) {
-        drawDot(dots[i]);
-        if (i > 0) drawLine(dots[i - 1], dots[i]);
-        if (i > 1) {
-            if (
-                equalDots(dots[i], dots[i - 1]) ||
-                equalDots(dots[i - 1], dots[i - 2])
-            )
-                writeAngle(0, dots[i - 1]);
-            else {
-                const dotAngle = vertexAngle(dots[i - 2], dots[i - 1], dots[i]);
-                writeAngle(dotAngle, dots[i - 1]);
+    dots = newState === null ? [[]] : newState.dotList;
+    const figureCount = dots.length;
+    for (let j = 0; j < figureCount; j++) {
+        const l = dots[j].length;
+        for (let i = 0; i < l; i++) {
+            drawDot(dots[j][i]);
+            if (i > 0) drawLine(dots[j][i - 1], dots[j][i]);
+            if (i > 1) {
+                if (
+                    equalDots(dots[j][i], dots[j][i - 1]) ||
+                    equalDots(dots[j][i - 1], dots[j][i - 2])
+                )
+                    writeAngle(0, dots[j][i - 1]);
+                else {
+                    const dotAngle = vertexAngle(
+                        dots[j][i - 2],
+                        dots[j][i - 1],
+                        dots[j][i]
+                    );
+                    writeAngle(dotAngle, dots[j][i - 1]);
+                }
             }
         }
     }
