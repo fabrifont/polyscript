@@ -11,13 +11,23 @@
 const CANVAS_WIDTH = 900;
 const CANVAS_HEIGHT = 550;
 
+// Constantes para ubicar el texto de los ángulos
+const ANGLE_DELTA_X = -30;
+const ANGLE_DELTA_Y = 25;
+
 // Array para almacenamiento de los Dots
 let dots = [[]];
 
 // Flag que indica si el próximo Dot colocado
 // creará una nueva figura dentro del canvas
 let newFigure = true;
+// Contador de figuras dibujadas en el canvas
 let lastFigure = 0;
+let lastFigureDotCounter = 0;
+const defaultDot = new Dot(0, 0);
+// Primer Dot de la figura actual
+let firstDot;
+const minimumDistance = 10;
 
 // Elementos principales del documento
 const startBtn = document.querySelector("#start-btn");
@@ -61,7 +71,7 @@ startBtn.addEventListener("click", () => {
     stateBtns.appendChild(saveBtn);
     stateBtns.appendChild(loadBtn);
 });
-canvas.addEventListener("click", placeDot);
+canvas.addEventListener("click", onCanvasClick);
 clearBtn.addEventListener("click", clearPlane);
 saveBtn.addEventListener("click", saveCanvas);
 loadBtn.addEventListener("click", loadCanvas);

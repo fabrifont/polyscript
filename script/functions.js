@@ -14,6 +14,28 @@ class Dot {
     }
 }
 
+// Angle: Dot Dot Dot -> Object
+// Función constructora del objeto Angle.
+// Se usa para representar el ángulo que forma un punto en relación
+// a otros dos. En particular, el punto considerado vértice es
+// el segundo parámetro, el de en medio.
+class Angle {
+    constructor(previousDot, vertexDot, nextDot) {
+        this.value = vertexAngle(previousDot, vertexDot, nextDot);
+        this.vertex = vertexDot;
+    }
+    draw() {
+        context.font = "18px Courier";
+        context.fillStyle = "blue";
+        context.strokeStyle = "";
+        context.lineWidth = 2;
+        const textPosX = this.vertex.x + ANGLE_DELTA_X;
+        const textPosY = this.vertex.y + ANGLE_DELTA_Y;
+        const angleText = this.value === 0 ? "0°" : `${this.value.toFixed(2)}°`;
+        context.fillText(angleText, textPosX, textPosY);
+    }
+}
+
 // equalDot: Dot Dot -> Bool
 // Recibe dos puntos y devuelve verdadero si son
 // coincidentes, falso en caso contrario
@@ -44,35 +66,103 @@ function drawLine(dot1, dot2) {
     context.stroke();
 }
 
-// placeDot: Event -> Void
+// drawDotAndAngle: Number -> Void
+// Recibe un número entero k y, para el k-ésimo punto,
+// lo dibuja y a su respectivo ángulo con su valor correspondiente
+function drawDotAndAngle(dotNumber) {
+    drawDot(dots[lastFigure][dotNumber]);
+    // Dibujado de línea
+    if (dotNumber > 0)
+        drawLine(dots[lastFigure][dotNumber - 1], dots[lastFigure][dotNumber]);
+    // Dibujado de ángulo
+    if (dotNumber > 1) {
+        const dotAngle = new Angle(
+            dots[lastFigure][dotNumber - 2],
+            dots[lastFigure][dotNumber - 1],
+            dots[lastFigure][dotNumber]
+        );
+        // Ángulo 0 para puntos coincidentes
+        if (
+            equalDots(
+                dots[lastFigure][dotNumber],
+                dots[lastFigure][dotNumber - 1]
+            ) ||
+            equalDots(
+                dots[lastFigure][dotNumber - 1],
+                dots[lastFigure][dotNumber - 2]
+            )
+        ) {
+            dotAngle.value = 0;
+        }
+        // Ángulo menor a 180° acorde (convexo)
+        dotAngle.draw();
+    }
+}
+
+// closeFigure: Void -> Void
+// No recibe argumentos. Cierra la última figura y comienza una nueva
+function closeFigure() {
+    dots[lastFigure].push(firstDot);
+    drawLine(dots[lastFigure][lastFigureDotCounter - 1], firstDot);
+    context.closePath();
+    let secondToLastAngle;
+    let lastAngle;
+    if (lastFigureDotCounter < 2) {
+        secondToLastAngle = new Angle(
+            dots[lastFigure][lastFigureDotCounter - 1],
+            dots[lastFigure][lastFigureDotCounter - 1],
+            dots[lastFigure][lastFigureDotCounter - 1]
+        );
+        lastAngle = new Angle(
+            dots[lastFigure][lastFigureDotCounter],
+            dots[lastFigure][lastFigureDotCounter],
+            dots[lastFigure][lastFigureDotCounter]
+        );
+        secondToLastAngle.value = 0;
+        lastAngle.value = 0;
+    } else {
+        secondToLastAngle = new Angle(
+            dots[lastFigure][lastFigureDotCounter - 2],
+            dots[lastFigure][lastFigureDotCounter - 1],
+            dots[lastFigure][lastFigureDotCounter]
+        );
+        lastAngle = new Angle(
+            dots[lastFigure][lastFigureDotCounter - 1],
+            dots[lastFigure][lastFigureDotCounter],
+            dots[lastFigure][1]
+        );
+    }
+    secondToLastAngle.draw();
+    lastAngle.draw();
+    lastFigure++;
+    dots.push([]);
+}
+
+// onCanvasClick: Event -> Void
 // Recibe el evento de un click, crea un dot con las coordenadas
 // de ese click, lo pushea a la lista de dots, y lo dibuja en el plano.
 // Si hay más de 1 punto, dibuja una línea entre el actual y el anterior.
 // Si hay más de 2 puntos, calcula y escribe el ángulo que forman el
 // último, el penúltimo (vértice), y el antepenúltimo
-function placeDot(event) {
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+function onCanvasClick(event) {
+    const x = event.offsetX;
+    const y = event.offsetY;
     const dot = new Dot(x, y);
-    dots[lastFigure].push(dot);
-    const n = dots[lastFigure].length - 1;
-    drawDot(dot);
-    if (n > 0) drawLine(dots[lastFigure][n - 1], dots[lastFigure][n]);
-    if (n > 1) {
-        if (
-            equalDots(dots[lastFigure][n], dots[lastFigure][n - 1]) ||
-            equalDots(dots[lastFigure][n - 1], dots[lastFigure][n - 2])
-        )
-            writeAngle(0, dots[lastFigure][n - 1]);
-        else {
-            const dotAngle = vertexAngle(
-                dots[lastFigure][n - 2],
-                dots[lastFigure][n - 1],
-                dots[lastFigure][n]
-            );
-            writeAngle(dotAngle, dots[lastFigure][n - 1]);
-        }
+    const isFirst = dots[lastFigure].length === 0;
+    lastFigureDotCounter = dots[lastFigure].length;
+    let closed = false;
+    if (isFirst) {
+        firstDot = dot;
+    }
+    // Caso 1: el nuevo punto está cerca del primero
+    else if (dist(dot, firstDot) < minimumDistance) {
+        closeFigure();
+        closed = true;
+    }
+    // Caso 2: el nuevo punto no está cerca del primero
+    if (!closed) {
+        dots[lastFigure].push(dot);
+        drawDotAndAngle(lastFigureDotCounter);
     }
 }
 
@@ -107,27 +197,13 @@ function vertexAngle(dot1, dot2, dot3) {
     return cosineTheorem(dot1_oppSide, dot2_oppSide, dot3_oppSide);
 }
 
-// writeAngle: Float Dot -> Void
-// Recibe el valor de un ángulo en grados, y lo dibuja
-// un poco debajo del Dot correspondiente
-function writeAngle(angle, vertex) {
-    const DELTA_X = -30;
-    const DELTA_Y = 25;
-    context.font = "18px Courier";
-    context.fillStyle = "blue";
-    context.strokeStyle = "";
-    context.lineWidth = 2;
-    const textPosX = vertex.x + DELTA_X;
-    const textPosY = vertex.y + DELTA_Y;
-    const angleText = angle === 0 ? "0°" : `${angle.toFixed(2)}°`;
-    context.fillText(angleText, textPosX, textPosY);
-}
 // clearPlane: Void -> Void
 // No recibe ningún dato, elimina los puntos del canvas y
 // vacía el array de dots
 function clearPlane() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     dots = [[]];
+    lastFigure = 0;
     toastNotif("Cleared canvas");
 }
 
@@ -147,14 +223,18 @@ function saveCanvas() {
 // No recibe ningún dato, busca en el local storage
 // el item "canvasImage" y recrea la imagen correspondiente
 // dibujando todos los puntos, líneas y ángulos
+// TODO: FALTA CAMBIAR QUE EL ÚLTIMO PUNTO DE LA FIGURA NO LO CARGUE, !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Y QUE CARGUE LA LÍNEA ENTRE EL PENÚLTIMO Y EL PRIMERO (como hace onCanvasClick) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 function loadCanvas() {
     canvas.width = canvas.width;
     const newState = JSON.parse(localStorage.getItem("canvasImage"));
     dots = newState === null ? [[]] : newState.dotList;
     const figureCount = dots.length;
+    // Por figura
     for (let j = 0; j < figureCount; j++) {
-        const l = dots[j].length;
-        for (let i = 0; i < l; i++) {
+        const dotCount = dots[j].length;
+        // Por punto
+        for (let i = 0; i < dotCount; i++) {
             drawDot(dots[j][i]);
             if (i > 0) drawLine(dots[j][i - 1], dots[j][i]);
             if (i > 1) {
