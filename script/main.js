@@ -71,10 +71,38 @@ startBtn.addEventListener("click", () => {
     stateBtns.appendChild(saveBtn);
     stateBtns.appendChild(loadBtn);
 });
-canvas.addEventListener("click", onCanvasClick);
-clearBtn.addEventListener("click", clearPlane);
-saveBtn.addEventListener("click", saveCanvas);
-loadBtn.addEventListener("click", loadCanvas);
+canvas.addEventListener("click", (event) => {
+    try {
+        onCanvasClick(event);
+    } catch (error) {
+        toastError(error);
+        console.error(error);
+    }
+});
+clearBtn.addEventListener("click", () => {
+    try {
+        clearPlane();
+    } catch (error) {
+        toastError(error);
+        console.error(error);
+    }
+});
+saveBtn.addEventListener("click", () => {
+    try {
+        saveCanvas();
+    } catch (error) {
+        toastError(error);
+        console.error(error);
+    }
+});
+loadBtn.addEventListener("click", () => {
+    try {
+        loadCanvas();
+    } catch (error) {
+        toastError(error);
+        console.error(error);
+    }
+});
 
 // PRUEBA
 const FIGURAS = [

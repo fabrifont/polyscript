@@ -69,27 +69,30 @@ function drawLine(dot1, dot2) {
 // drawDotAndAngle: Number -> Void
 // Recibe un número entero k y, para el k-ésimo punto,
 // lo dibuja y a su respectivo ángulo con su valor correspondiente
-function drawDotAndAngle(dotNumber) {
-    drawDot(dots[lastFigure][dotNumber]);
+function drawDotAndAngle(figureNumber, dotNumber) {
+    drawDot(dots[figureNumber][dotNumber]);
     // Dibujado de línea
     if (dotNumber > 0)
-        drawLine(dots[lastFigure][dotNumber - 1], dots[lastFigure][dotNumber]);
+        drawLine(
+            dots[figureNumber][dotNumber - 1],
+            dots[figureNumber][dotNumber]
+        );
     // Dibujado de ángulo
     if (dotNumber > 1) {
         const dotAngle = new Angle(
-            dots[lastFigure][dotNumber - 2],
-            dots[lastFigure][dotNumber - 1],
-            dots[lastFigure][dotNumber]
+            dots[figureNumber][dotNumber - 2],
+            dots[figureNumber][dotNumber - 1],
+            dots[figureNumber][dotNumber]
         );
         // Ángulo 0 para puntos coincidentes
         if (
             equalDots(
-                dots[lastFigure][dotNumber],
-                dots[lastFigure][dotNumber - 1]
+                dots[figureNumber][dotNumber],
+                dots[figureNumber][dotNumber - 1]
             ) ||
             equalDots(
-                dots[lastFigure][dotNumber - 1],
-                dots[lastFigure][dotNumber - 2]
+                dots[figureNumber][dotNumber - 1],
+                dots[figureNumber][dotNumber - 2]
             )
         ) {
             dotAngle.value = 0;
@@ -99,37 +102,43 @@ function drawDotAndAngle(dotNumber) {
     }
 }
 
-// closeFigure: Void -> Void
-// No recibe argumentos. Cierra la última figura y comienza una nueva
-function closeFigure() {
-    dots[lastFigure].push(firstDot);
-    drawLine(dots[lastFigure][lastFigureDotCounter - 1], firstDot);
+// closeFigure: Number -> Void
+// Recibe el número de la figura a cerrar y la cantidad de puntos de la misma.
+// Cierra la última figura y comienza una nueva
+function closeFigure(figureAmount, dotAmount) {
+    dots[figureAmount].push(dots[figureAmount][0]);
+    if (dotAmount > 0) {
+        drawLine(
+            dots[figureAmount][dotAmount - 1],
+            dots[figureAmount][dotAmount]
+        );
+    }
     context.closePath();
     let secondToLastAngle;
     let lastAngle;
-    if (lastFigureDotCounter < 2) {
+    if (dotAmount === 2 || dotAmount === 1) {
         secondToLastAngle = new Angle(
-            dots[lastFigure][lastFigureDotCounter - 1],
-            dots[lastFigure][lastFigureDotCounter - 1],
-            dots[lastFigure][lastFigureDotCounter - 1]
+            dots[figureAmount][dotAmount - 1],
+            dots[figureAmount][dotAmount - 1],
+            dots[figureAmount][dotAmount - 1]
         );
         lastAngle = new Angle(
-            dots[lastFigure][lastFigureDotCounter],
-            dots[lastFigure][lastFigureDotCounter],
-            dots[lastFigure][lastFigureDotCounter]
+            dots[figureAmount][dotAmount],
+            dots[figureAmount][dotAmount],
+            dots[figureAmount][dotAmount]
         );
         secondToLastAngle.value = 0;
         lastAngle.value = 0;
-    } else {
+    } else if (dotAmount != 0) {
         secondToLastAngle = new Angle(
-            dots[lastFigure][lastFigureDotCounter - 2],
-            dots[lastFigure][lastFigureDotCounter - 1],
-            dots[lastFigure][lastFigureDotCounter]
+            dots[figureAmount][dotAmount - 2],
+            dots[figureAmount][dotAmount - 1],
+            dots[figureAmount][dotAmount]
         );
         lastAngle = new Angle(
-            dots[lastFigure][lastFigureDotCounter - 1],
-            dots[lastFigure][lastFigureDotCounter],
-            dots[lastFigure][1]
+            dots[figureAmount][dotAmount - 1],
+            dots[figureAmount][dotAmount],
+            dots[figureAmount][1]
         );
     }
     secondToLastAngle.draw();
@@ -156,13 +165,13 @@ function onCanvasClick(event) {
     }
     // Caso 1: el nuevo punto está cerca del primero
     else if (dist(dot, firstDot) < minimumDistance) {
-        closeFigure();
+        closeFigure(lastFigure, lastFigureDotCounter);
         closed = true;
     }
     // Caso 2: el nuevo punto no está cerca del primero
     if (!closed) {
         dots[lastFigure].push(dot);
-        drawDotAndAngle(lastFigureDotCounter);
+        drawDotAndAngle(lastFigure, lastFigureDotCounter);
     }
 }
 
@@ -204,6 +213,7 @@ function clearPlane() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     dots = [[]];
     lastFigure = 0;
+    lastFigureDotCounter = 0;
     toastNotif("Cleared canvas");
 }
 
@@ -215,7 +225,6 @@ function saveCanvas() {
         dotList: dots,
     };
     localStorage.setItem("canvasImage", JSON.stringify(state));
-    console.log("Imagen guardada.");
     toastNotif("Saved canvas");
 }
 
@@ -229,32 +238,25 @@ function loadCanvas() {
     canvas.width = canvas.width;
     const newState = JSON.parse(localStorage.getItem("canvasImage"));
     dots = newState === null ? [[]] : newState.dotList;
-    const figureCount = dots.length;
-    // Por figura
-    for (let j = 0; j < figureCount; j++) {
-        const dotCount = dots[j].length;
-        // Por punto
-        for (let i = 0; i < dotCount; i++) {
-            drawDot(dots[j][i]);
-            if (i > 0) drawLine(dots[j][i - 1], dots[j][i]);
-            if (i > 1) {
-                if (
-                    equalDots(dots[j][i], dots[j][i - 1]) ||
-                    equalDots(dots[j][i - 1], dots[j][i - 2])
-                )
-                    writeAngle(0, dots[j][i - 1]);
-                else {
-                    const dotAngle = vertexAngle(
-                        dots[j][i - 2],
-                        dots[j][i - 1],
-                        dots[j][i]
-                    );
-                    writeAngle(dotAngle, dots[j][i - 1]);
-                }
+    lastFigure = dots.length - 1;
+    for (let i = 0; i <= lastFigure; i++) {
+        if (dots[i].length != 0) {
+            lastFigureDotCounter = dots[i].length - 1;
+            firstDot = dots[i][0];
+            for (let j = 0; j < lastFigureDotCounter; j++) {
+                drawDotAndAngle(i, j);
+            }
+            if (
+                dist(dots[i][lastFigureDotCounter], firstDot) <
+                    minimumDistance &&
+                lastFigureDotCounter != 0
+            ) {
+                closeFigure(i, lastFigureDotCounter);
+            } else {
+                drawDotAndAngle(i, lastFigureDotCounter);
             }
         }
     }
-    toastNotif("Loaded canvas");
 }
 
 // toastNotif: String -> Void
@@ -269,8 +271,29 @@ function toastNotif(text) {
         escapeMarkup: "true",
         style: {
             color: "white",
+            "text-shadow": "1px 1px 4px black",
             background:
-                "linear-gradient(90deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%, rgba(237, 221, 83, 1) 100%)",
+                "linear-gradient(90deg, #0ffa17 0%, #0ffa81 50%, #0ffae7 100%)",
+            border: "none",
+            "box-shadow": "10px 10px 20px 0px rgba(0,0,0,0.38)",
+        },
+    }).showToast();
+}
+
+// toastError: String -> Void
+// Recibe un error y muestra una notificación de
+// Toastify de color rojo con el texto correspondiente
+function toastError(errorText) {
+    Toastify({
+        text: errorText,
+        gravity: "bottom",
+        position: "right",
+        escapeMarkup: "true",
+        style: {
+            color: "white",
+            "text-shadow": "1px 1px 4px black",
+            background:
+                "linear-gradient(90deg, #fa0f0f 0%, #cd0808 49%, #9e0000 100%)",
             border: "none",
             "box-shadow": "10px 10px 20px 0px rgba(0,0,0,0.38)",
         },
