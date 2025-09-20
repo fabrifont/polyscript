@@ -214,7 +214,6 @@ function clearPlane() {
     dots = [[]];
     lastFigure = 0;
     lastFigureDotCounter = 0;
-    toastNotif("Cleared canvas");
 }
 
 // saveCanvas: Void -> Void
@@ -225,7 +224,6 @@ function saveCanvas() {
         dotList: dots,
     };
     localStorage.setItem("canvasImage", JSON.stringify(state));
-    toastNotif("Saved canvas");
 }
 
 // loadCanvas: Void -> Void

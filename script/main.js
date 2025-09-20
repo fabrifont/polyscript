@@ -91,14 +91,14 @@ startBtn.addEventListener("click", () => {
 
             const choices = data.figures.map((fig, idx) => ({
                 value: String(idx),
-                label: fig.name || `Figura ${idx + 1}`,
+                label: fig.name || `Figure ${idx + 1}`,
             }));
 
             choicesDropdown.setChoices(choices, "value", "label", true);
         })
         .catch((err) => {
-            console.error("Error cargando JSON:", err);
-            toastError("Error cargando JSON (revisá la ruta y el archivo).");
+            console.error("JSON loading error:", err);
+            toastError("JSON loading error: (check file route and name).");
         });
     const loadExampleBtn = document.createElement("button");
     loadExampleBtn.setAttribute("id", "loadExampleBtn");
@@ -108,19 +108,19 @@ startBtn.addEventListener("click", () => {
     loadExampleBtn.addEventListener("click", () => {
         try {
             if (!examplesData || !examplesData.figures?.length) {
-                toastError("No hay ejemplos cargados.");
+                toastError("No loaded examples.");
                 return;
             }
 
             const selected = choicesDropdown.getValue(true); // devuelve el value (índice en string)
             if (selected === "" || selected == null) {
-                toastError("Seleccioná un ejemplo primero.");
+                toastError("Select an example first.");
                 return;
             }
 
             const fig = examplesData.figures[Number(selected)];
             if (!fig || !Array.isArray(fig.dots) || fig.dots.length === 0) {
-                toastError("Ejemplo inválido.");
+                toastError("Invalid example.");
                 return;
             }
 
@@ -131,7 +131,7 @@ startBtn.addEventListener("click", () => {
 
             toastNotif(
                 `Loaded example: ${
-                    fig.name || `Figura ${Number(selected) + 1}`
+                    fig.name || `Figure ${Number(selected) + 1}`
                 }`
             );
         } catch (error) {
@@ -152,6 +152,7 @@ canvas.addEventListener("click", (event) => {
 clearBtn.addEventListener("click", () => {
     try {
         clearPlane();
+        toastNotif("Cleared canvas.");
     } catch (error) {
         toastError(error);
         console.error(error);
@@ -160,6 +161,7 @@ clearBtn.addEventListener("click", () => {
 saveBtn.addEventListener("click", () => {
     try {
         saveCanvas();
+        toastNotif("Saved canvas.");
     } catch (error) {
         toastError(error);
         console.error(error);
@@ -168,6 +170,7 @@ saveBtn.addEventListener("click", () => {
 loadBtn.addEventListener("click", () => {
     try {
         loadCanvas();
+        toastNotif("Loaded canvas.");
     } catch (error) {
         toastError(error);
         console.error(error);

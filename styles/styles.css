@@ -82,8 +82,21 @@ footer {
     height: 30px;
 }
 
+#loadExampleBtn {
+    min-width: 150px;
+    padding: 10px 20px;
+    font-size: 16px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
 .choices {
-    color: black;
+    color: #3d3d3d;
     font-weight: bolder;
     font-size: larger;
     width: 200px;
