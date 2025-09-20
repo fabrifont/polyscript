@@ -81,3 +81,10 @@ footer {
     width: 70px;
     height: 30px;
 }
+
+.choices {
+    color: black;
+    font-weight: bolder;
+    font-size: larger;
+    width: 200px;
+}
